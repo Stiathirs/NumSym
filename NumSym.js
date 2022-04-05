@@ -183,7 +183,8 @@ function interpret(inputCode,inputText){
     }
   }
   ignoreEndCmd = 0;
-  
+  outputConsole.scrollTop = outputConsole.scrollHeight;
+
   // If we're still running and haven't reached the end, increment the code pointer and interpret.
   if (running == 1 && i < inputCode.length){
     i++;
