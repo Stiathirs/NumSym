@@ -1,0 +1,72 @@
+<html>
+  <head>
+    <title>NumSym</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    
+    <h1>NumSym Interpreter</h1>
+    <h2>NumSym created by Stiathirs the Protogen</h2>
+    <textarea id=code rows=10 cols=50 placeholder="Code goes here"></textarea><br>
+    <textarea id=input rows=1 cols=50 placeholder="Input"></textarea><br>
+    <button id=button onclick="initialize();">Run Code</button><br>
+    <textarea id=output rows=10 cols=50 placeholder="Output goes here" readonly></textarea>
+    <pre id=error></pre><script type="text/javascript" src="NumSym.js"></script>
+    <h1>Syntax:</h1>
+    <pre>
+0-9             Push that number to the stack.
+
+^               Take input from the user and push its ASCII value to the stack. If there's
+                no more input to take, pushes 0 to the stack.
+
+!               Duplicate the top value on the stack.
+
+&commat;               Reverses the order of the stack.
+
++ - * / %       Pop the top two values and add/subtract/multiply/divide/mod them, the top
+                value being on the right side.
+
+;               Pop the top value of the stack and discard it.
+
+#               Pop the top value of the stack and output it as a number.
+
+$               Pop the top value of the stack and output it as its corresponding
+                ASCII character.
+
+&lt; = &gt;           Pop the top two values and check if the left side is less than/equal to
+                /greater than the right, the top value being on the right side. If the condition is
+                true, pushes 1 to the stack, otherwise, pushes 0.
+                
+[               Start a loop if the top value of the stack is not 0 (the value is not removed from the
+                stack, use ; to discard it if not needed).
+
+]               End a loop. This is ignored if not in a loop.
+
+You may use as much or as little whitespace as you wish (even none).
+Anything that isn't a command is automatically removed by the interpreter.</pre>
+
+    <h1>Examples</h1>
+    <p>Hello World: <code>98*!$65*1-+!$7+!$!$3+!$25*1+32**1+-!$62*-!$25*1+5*+!$64*+!$3+!$6-!$8-!$25*1+32**1+-$</code>
+    </p>
+    <p>Hello World (shorter): <code>98*!65*1-+!7+!!3+!25*1+32**1+-!62*-!25*1+5*+!64*+!3+!6-!8-!25*1+32**1+-0@[$]</code></p>
+    <p><a target="_blank" href="https://esolangs.org/wiki/Truth-machine">Truth Machine</a>: <code>^68*1+=[!#]#</code></p>
+    <p><a target="_blank" href="https://esolangs.org/wiki/Cat_program">Cat Program</a>: <code>^[$^]</code></p>
+
+    Sample Commenting, done on the truth machine:
+    <pre><code style="display:block">0[This is a loop comment, and any code that is in here will never run, like 188*+$.
+  Loop comments are formatted like this: 0[Comment];
+  The semicolon at the end is important because it discards the 0 we pushed to the stack.
+  [ and ] can also be used, they just have to be balanced.
+  The way this works is by pushing a 0 to the stack, and starting a loop, the loop will be skipped because the top value is 0.
+  We don't have to use loop comments if we aren't going to use instructions in a comment, but it's still recommended.];
+
+0[This is a truth machine. If the user inputs 0, print a 0 and terminate the program. If the user inputs 1, print 1s indefinitely];
+
+0[Get user input, this can be assumed to be a 1 or a 0, but if it isn't, it will be treated like a 0 later:]; ^
+0[Push 49 to the stack, the ASCII code for 1:]; 68*1+
+0[Check if the user input is 49, if so, push 1 and start the loop:]; =[
+0[Duplicate the user input and output it:]; !#
+0[End the loop:]; ]
+0[The only way the program will reach this point is if a number or letter that isn't 1 was input. Just output 0 and call it a day:]; #</code></pre>
+  </body>
+</html>
