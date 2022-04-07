@@ -1,37 +1,20 @@
-var i;
-var ignoreEndCmd;
-var inputi;
-var running = 0;
-var outputConsole = document.getElementById("output");
-var button = document.getElementById("button");
-var stack;
-var balance;
-var error = document.getElementById("error");
-function initialize(){
-  var code = document.getElementById("code").value;
-  error.innerHTML = "";
-  i = 0;
-  inputi = 0;
-  ignoreEndCmd = 0;
-  var input = document.getElementById("input").value;
-  stack = [];
-  balance = 0;
-  code = code.replace(/[^0-9\+\-\*\/%^!@;#$<=>\[\]]/g,"");
-  button.onclick = terminateCode;
-  button.innerHTML = "Stop Running";
-  running = 1;
-  outputConsole.innerHTML = "";
-  interpret(code,input);
-}
+// Define variables
+var arguments = process.argv.slice(2); // Get console args
+var inputCode = arguments[0]; // first argument is the code
+var inputText;  // second is the input
+try{inputText = arguments[1];}catch{inputText="";}
+var i = 0; // Command pointer
+var ignoreEndCmd = false; // Useful later
+var inputi = 0;
+var stack = [];
+var balance = 0;
 
-function terminateCode(){
-  button.onclick = initialize;
-  running = 0; 
-  button.innerHTML = "Run Code";
-}
+// Clean up the code
+inputCode = inputCode.replace(/[^0-9\+\-\*\/%^!@;#$<=>\[\]]/g,"");
 
-function interpret(inputCode,inputText){
-  // Get current working character, non command
+// Interpret the code
+while (i < inputCode.length){
+  // Get current working character
   var currentChar = inputCode.charAt(i);
 
   // Push number to stack
@@ -55,8 +38,7 @@ function interpret(inputCode,inputText){
       var temp = stack.pop();
       stack.push(temp,temp);
     }else{
-      terminateCode();
-      error.innerHTML = "Error when Duplicating: Stack is empty.";
+      throw{name: "StackUnderflowError", message: "Stack is empty"};
     }
   }
   
@@ -72,28 +54,25 @@ function interpret(inputCode,inputText){
       var str = left.toString()+currentChar+right.toString();
       stack.push(eval(str));
     }else{
-      terminateCode();
-      error.innerHTML = "Error when doing Arithmetic: Stack contains less than two values.";
+      throw{name: "StackUnderflowError", message: "Stack contains less than two values"};
     }
   }
   
   // Pop and print as number
   if (/\#/.test(currentChar)){
     if(stack.length > 0){
-      outputConsole.innerHTML = outputConsole.innerHTML + stack.pop().toString();
+      process.stdout.write(stack.pop().toString());
     }else{
-      terminateCode();
-      error.innerHTML = "Error when Printing Number: Stack is empty.";
+      throw{name: "StackUnderflowError", message: "Stack is empty"};
     }
   }
   
   // Pop and print as ASCII
   if (/\$/.test(currentChar)){
     if (stack.length > 0){
-      outputConsole.innerHTML = outputConsole.innerHTML + String.fromCharCode(stack.pop());
+      process.stdout.write(String.fromCharCode(stack.pop()));
     }else{
-      terminateCode();
-      error.innerHTML = "Error when printing ASCII character: Stack is empty.";
+      throw{name: "StackUnderflowError", message: "Stack is empty"};
     }
   }
   
@@ -102,8 +81,7 @@ function interpret(inputCode,inputText){
     if(stack.length > 0){
       stack.pop();
     }else{
-      terminateCode();
-      error.innerHTML = "Error when Discarding: Stack is empty.";
+      throw{name: "StackUnderflowError", message: "Stack is empty"};
     }
   }
   
@@ -127,8 +105,7 @@ function interpret(inputCode,inputText){
         }
       }
     }else{
-      terminateCode();
-      error.innerHTML = "Error when doing conditional: Stack contains less than two values.";
+      throw{name: "StackUnderflowError", message: "Stack contains less than two values"};
     }
   }  
   
@@ -151,16 +128,15 @@ function interpret(inputCode,inputText){
             balance--;
           }
         }
-        ignoreEndCmd = 1;
+        ignoreEndCmd = true;
       }
     }else{
-      terminateCode();
-      error.innerHTML = "Error when checking to start loop: Stack is empty.";
+      throw{name: "StackUnderflowError", message: "Stack is empty"};
     }
   }
   
   // Signifies end of a loop. If not in a loop, ignore this instruction.
-  if(ignoreEndCmd == 0){
+  if(!ignoreEndCmd){
     if (/\]/g.test(currentChar)){
       if (balance > 0){
         var origBal = balance;
@@ -178,14 +154,7 @@ function interpret(inputCode,inputText){
       }
     }
   }
-  ignoreEndCmd = 0;
-  outputConsole.scrollTop = outputConsole.scrollHeight;
+  ignoreEndCmd = false; // Make sure to re-enable ]
 
-  // If we're still running and haven't reached the end, increment the code pointer and interpret.
-  if (running == 1 && i < inputCode.length){
-    i++;
-    setTimeout(interpret,1,inputCode,inputText);
-  }else{
-    terminateCode();
-  }
+  i++; // Increment the code pointer
 }
