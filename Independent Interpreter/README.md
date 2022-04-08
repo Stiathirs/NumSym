@@ -5,5 +5,5 @@
 
 ### Running a program
 ```shell
-$ node NumSym.js numsymfile [inputstring]
+$ node NumSym.js numsymfile [inputfile|inputstring]
 ```
